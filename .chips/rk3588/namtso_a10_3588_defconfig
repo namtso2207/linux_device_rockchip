@@ -1,4 +1,5 @@
 RK_YOCTO_CFG="namtso-a10-3588.conf"
+RK_YOCTO_MACHINE="namtso-a10-3588"
 RK_WIFIBT_TTY="ttyS6"
 RK_KERNEL_DTS_NAME="rk3588-namtso-a10-3588"
 RK_KERNEL_CFG="namtso-a10-3588_defconfig"
