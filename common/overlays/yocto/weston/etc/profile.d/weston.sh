@@ -17,6 +17,7 @@ export WESTON_DISABLE_ATOMIC=1
 
 # Primary screen
 # export WESTON_DRM_PRIMARY=eDP-1
+export WESTON_DRM_PRIMARY=DSI-1
 
 # Single screen
 # export WESTON_DRM_SINGLE_HEAD=1
@@ -36,7 +37,7 @@ export WESTON_DISABLE_ATOMIC=1
 # export WESTON_DRM_VIRTUAL_SIZE=1024x768
 
 # Comment out these to disable mirror mode
-export WESTON_DRM_MIRROR=1
+# export WESTON_DRM_MIRROR=1
 export WESTON_DRM_KEEP_RATIO=1
 
 # Disable DRM plane hardware scale feature
