@@ -270,11 +270,11 @@ build_wifibt()
 	done
 	install -m 0655 $RKWIFIBT_DIR/conf/* "$TARGET_DIR/etc/"
 	install -m 0755 $RKWIFIBT_DIR/bin/arm/* "$TARGET_DIR/usr/bin/"
-	install -m 0755 $RKWIFIBT_DIR/scripts/* "$TARGET_DIR/usr/bin/"
-	for b in bt-tty wifibt-info wifibt-vendor wifibt-id wifibt-bus \
-		wifibt-chip wifibt-module; do
-		ln -sf wifibt-util.sh "$TARGET_DIR/usr/bin/$b"
-	done
+	# install -m 0755 $RKWIFIBT_DIR/scripts/* "$TARGET_DIR/usr/bin/"
+	# for b in bt-tty wifibt-info wifibt-vendor wifibt-id wifibt-bus \
+	# 	wifibt-chip wifibt-module; do
+	# 	ln -sf wifibt-util.sh "$TARGET_DIR/usr/bin/$b"
+	# done
 
 	if [[ "$RK_WIFIBT_CHIP" = "ALL_CY" ]];then
 		echo "copy infineon/realtek firmware/nvram to rootfs"
@@ -356,9 +356,9 @@ build_wifibt()
 	fi
 
 	# Install boot services
-	install_sysv_service $RKWIFIBT_DIR/S36wifibt-init.sh S
-	install_busybox_service $RKWIFIBT_DIR/S36wifibt-init.sh
-	install_systemd_service $RKWIFIBT_DIR/wifibt-init.service
+	# install_sysv_service $RKWIFIBT_DIR/S36wifibt-init.sh S
+	# install_busybox_service $RKWIFIBT_DIR/S36wifibt-init.sh
+	# install_systemd_service $RKWIFIBT_DIR/wifibt-init.service
 
 	# Log collection
 	mkdir -p "$TARGET_DIR/etc/generate_logs.d"
