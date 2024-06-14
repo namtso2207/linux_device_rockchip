@@ -1,0 +1,24 @@
+#
+
+menu "Ubuntu"
+
+config NAMTSO_UBUNTU
+	bool "ubuntu"
+	default y
+
+if NAMTSO_UBUNTU
+
+config NAMTSO_UBUNTU_BASE_CFG
+	string "ubuntu rootfs base cfg (rockchip_<cfg>_defconfig)"
+	default RK_CHIP_FAMILY
+	help
+	  Base name of ubuntu defconfig for rootfs.
+
+config NAMTSO_UBUNTU_CFG
+	string
+	default "rockchip_${RK_CHIP_FAMILY}" if NAMTSO_UBUNTU_BASE_CFG = ""
+	default "rockchip_${NAMTSO_UBUNTU_BASE_CFG}"
+
+endif
+
+endmenu # ubuntu
