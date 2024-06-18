@@ -1,7 +1,5 @@
 #!/bin/bash -e
 
-set -x
-
 build_buildroot()
 {
 	check_config RK_BUILDROOT || false
@@ -248,6 +246,9 @@ ubuntu_config_network()
 	sudo sed -i "s/#DNS=.*/DNS=$NAMESERVER/g" ubuntu/base/temp/etc/systemd/resolved.conf
 
 	sudo cp -rpvf ubuntu/base/config/10-globally-managed-devices.conf ubuntu/base/temp/etc/NetworkManager/conf.d
+
+	# ssh
+	sudo chroot ubuntu/base/temp /bin/bash -c "dpkg-reconfigure openssh-server"
 }
 
 ubuntu_config_misc()

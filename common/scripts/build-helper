@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -x
-
 [ -z "$DEBUG" ] || set -x
 
 # Make sure that we are sourced and called inside of RK build scripts.
