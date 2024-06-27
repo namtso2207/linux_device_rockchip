@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -x
+
 if [ -z "$BASH_SOURCE" ]; then
 	echo "Not in bash, switching to it..."
 	case "${@:-shell}" in

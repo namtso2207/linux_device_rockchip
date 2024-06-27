@@ -2,22 +2,41 @@
 
 menu "Ubuntu"
 
-config NAMTSO_UBUNTU
-	bool "ubuntu"
+config NAMTSO_UBUNTU_22_04
+	bool "ubuntu22.04"
 	default y
 
-if NAMTSO_UBUNTU
+if NAMTSO_UBUNTU_22_04
 
-config NAMTSO_UBUNTU_BASE_CFG
-	string "ubuntu rootfs base cfg (rockchip_<cfg>_defconfig)"
+config NAMTSO_UBUNTU22_04_BASE_CFG
+	string "ubuntu22.04 rootfs base cfg (rockchip_<cfg>_defconfig)"
 	default RK_CHIP_FAMILY
 	help
 	  Base name of ubuntu defconfig for rootfs.
 
-config NAMTSO_UBUNTU_CFG
+config NAMTSO_UBUNTU22_04_CFG
 	string
-	default "rockchip_${RK_CHIP_FAMILY}" if NAMTSO_UBUNTU_BASE_CFG = ""
-	default "rockchip_${NAMTSO_UBUNTU_BASE_CFG}"
+	default "rockchip_${RK_CHIP_FAMILY}" if NAMTSO_UBUNTU22_04_BASE_CFG = ""
+	default "rockchip_${NAMTSO_UBUNTU22_04_BASE_CFG}"
+
+endif
+
+config NAMTSO_UBUNTU_24_04
+	bool "ubuntu24.04"
+	default y
+
+if NAMTSO_UBUNTU_24_04
+
+config NAMTSO_UBUNTU24_04_BASE_CFG
+	string "ubuntu24.04 rootfs base cfg (rockchip_<cfg>_defconfig)"
+	default RK_CHIP_FAMILY
+	help
+	  Base name of ubuntu defconfig for rootfs.
+
+config NAMTSO_UBUNTU24_04_CFG
+	string
+	default "rockchip_${RK_CHIP_FAMILY}" if NAMTSO_UBUNTU24_04_BASE_CFG = ""
+	default "rockchip_${NAMTSO_UBUNTU24_04_BASE_CFG}"
 
 endif
 

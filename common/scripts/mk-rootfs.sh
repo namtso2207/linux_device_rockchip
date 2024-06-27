@@ -1,5 +1,7 @@
 #!/bin/bash -e
 
+set -x
+
 build_buildroot()
 {
 	check_config RK_BUILDROOT || false
@@ -132,34 +134,42 @@ build_debian()
 	finish_build build_debian $@
 }
 
+UBUNTU_PATH="ubuntu/base"
+UBUNTU_ROOTFS_PATH_22_04="ubuntu/base/temp_22_04"
+UBUNTU_ROOTFS_PATH_24_04="ubuntu/base/temp_24_04"
+
 ubuntu_install_package()
 {
 	message "=========================================="
 	message "          Install package for Ubuntu"
 	message "=========================================="
 
-	sudo cp -rpvf ubuntu/base/packages/* ubuntu/base/temp/root/
-	sudo mv *.deb  ubuntu/base/temp/root/
+	sudo cp -rpvf $UBUNTU_PATH/packages/* $1/root/
+	sudo mv *.deb $1/root/
 
-	sudo chroot ubuntu/base/temp /bin/bash -c "dpkg -i /root/linux-gpu-mali-wayland_1.2-g13p0-230620_arm64.deb"
-	sudo chroot ubuntu/base/temp /bin/bash -c "dpkg -i /root/rockchip-mpp_1.5.0-9_arm64.deb"
-	sudo chroot ubuntu/base/temp /bin/bash -c "dpkg -i /root/rockchip-mpp-sample_1.5.0-9_arm64.deb"
-	sudo chroot ubuntu/base/temp /bin/bash -c "dpkg -i /root/rockchip-mpp-dev_1.5.0-9_arm64.deb"
-	sudo chroot ubuntu/base/temp /bin/bash -c "dpkg -i /root/rockchip-rga_2.2.0-6_arm64.deb"
-	sudo chroot ubuntu/base/temp /bin/bash -c "dpkg -i /root/rockchip-rga-sample_2.2.0-6_arm64.deb"
-	sudo chroot ubuntu/base/temp /bin/bash -c "dpkg -i /root/rockchip-rga-dev_2.2.0-6_arm64.deb"
-	sudo chroot ubuntu/base/temp /bin/bash -c "dpkg -i /root/gstreamer1.0-rockchip1_1.14-6_arm64.deb"
-	sudo chroot ubuntu/base/temp /bin/bash -c "dpkg -i /root/camera-engine-rkaiq_0.3-5.0x4.1_arm64.deb"
-	sudo chroot ubuntu/base/temp /bin/bash -c "dpkg -i /root/xwayland_22.1.1-1_arm64.deb"
-	sudo chroot ubuntu/base/temp /bin/bash -c "dpkg -i /root/mutter-common_42.0-3ubuntu3_all.deb"
-	sudo chroot ubuntu/base/temp /bin/bash -c "dpkg -i /root/mutter_42.0-3ubuntu3_arm64.deb"
-	sudo chroot ubuntu/base/temp /bin/bash -c "dpkg -i /root/libmutter-10-0_42.0-3ubuntu3_arm64.deb"
-	sudo chroot ubuntu/base/temp /bin/bash -c "dpkg -i /root/gir1.2-mutter-10_42.0-3ubuntu3_arm64.deb"
-	sudo chroot ubuntu/base/temp /bin/bash -c "dpkg -i /root/gir1.2-mutter-10_42.0-3ubuntu3_arm64.deb"
-	sudo chroot ubuntu/base/temp /bin/bash -c "dpkg -i /root/linux-image-rockchip-5.10_1.0_arm64.deb"
-	sudo chroot ubuntu/base/temp /bin/bash -c "dpkg -i /root/linux-dtb-rockchip-5.10_1.0_arm64.deb"
-	sudo chroot ubuntu/base/temp /bin/bash -c "dpkg -i /root/linux-headers-rockchip-5.10_1.0_arm64.deb"
-	sudo chroot ubuntu/base/temp /bin/bash -c "rm -rf /root/*.deb"
+	if [ "$1" = "$UBUNTU_ROOTFS_PATH_22_04" ]; then
+		sudo chroot $1 /bin/bash -c "dpkg -i /root/linux-gpu-mali-wayland_1.2-g13p0-230620_arm64.deb"
+		sudo chroot $1 /bin/bash -c "dpkg -i /root/xwayland_22.1.1-1_arm64.deb"
+		sudo chroot $1 /bin/bash -c "dpkg -i /root/mutter-common_42.0-3ubuntu3_all.deb"
+		sudo chroot $1 /bin/bash -c "dpkg -i /root/mutter_42.0-3ubuntu3_arm64.deb"
+		sudo chroot $1 /bin/bash -c "dpkg -i /root/libmutter-10-0_42.0-3ubuntu3_arm64.deb"
+		sudo chroot $1 /bin/bash -c "dpkg -i /root/gir1.2-mutter-10_42.0-3ubuntu3_arm64.deb"
+		sudo chroot $1 /bin/bash -c "dpkg -i /root/gir1.2-mutter-10_42.0-3ubuntu3_arm64.deb"
+	fi
+
+	sudo chroot $1 /bin/bash -c "dpkg -i /root/rockchip-mpp_1.5.0-9_arm64.deb"
+	sudo chroot $1 /bin/bash -c "dpkg -i /root/rockchip-mpp-sample_1.5.0-9_arm64.deb"
+	sudo chroot $1 /bin/bash -c "dpkg -i /root/rockchip-mpp-dev_1.5.0-9_arm64.deb"
+	sudo chroot $1 /bin/bash -c "dpkg -i /root/rockchip-rga_2.2.0-6_arm64.deb"
+	sudo chroot $1 /bin/bash -c "dpkg -i /root/rockchip-rga-sample_2.2.0-6_arm64.deb"
+	sudo chroot $1 /bin/bash -c "dpkg -i /root/rockchip-rga-dev_2.2.0-6_arm64.deb"
+	sudo chroot $1 /bin/bash -c "dpkg -i /root/gstreamer1.0-rockchip1_1.14-6_arm64.deb"
+	
+	sudo chroot $1 /bin/bash -c "dpkg -i /root/camera-engine-rkaiq_0.3-5.0x4.1_arm64.deb"
+	sudo chroot $1 /bin/bash -c "dpkg -i /root/linux-image-rockchip-5.10_1.0_arm64.deb"
+	sudo chroot $1 /bin/bash -c "dpkg -i /root/linux-dtb-rockchip-5.10_1.0_arm64.deb"
+	sudo chroot $1 /bin/bash -c "dpkg -i /root/linux-headers-rockchip-5.10_1.0_arm64.deb"
+	sudo chroot $1 /bin/bash -c "rm -rf /root/*.deb"
 }
 
 ubuntu_config_services()
@@ -168,39 +178,35 @@ ubuntu_config_services()
 	message "          Config services for Ubuntu"
 	message "=========================================="
 
-	local UBUNTU_PATH="ubuntu/base"
-	local UBUNTU_ROOTFS_PATH="ubuntu/base/temp"
-
 	# copy exec
-	sudo cp -rpvf $UBUNTU_PATH/bin/resize2fs $UBUNTU_ROOTFS_PATH/etc/init.d/
-	sudo cp -rpvf $UBUNTU_PATH/bin/bluetooth-namtso.sh $UBUNTU_ROOTFS_PATH/usr/local/bin/
-	sudo cp -rpvf $UBUNTU_PATH/bin/fan_setup.sh $UBUNTU_ROOTFS_PATH/usr/local/bin/
-	sudo cp -rpvf $UBUNTU_PATH/bin/fan.sh $UBUNTU_ROOTFS_PATH/usr/local/bin/
-	sudo cp -rpvf $UBUNTU_PATH/bin/namtso_bluetooth_suspend.sh $UBUNTU_ROOTFS_PATH/usr/local/bin/
-	sudo cp -rpvf $UBUNTU_PATH/bin/fix-dp-sound.sh $UBUNTU_ROOTFS_PATH/usr/local/bin/
-	sudo cp -rpvf $UBUNTU_PATH/bin/fix-gdm-wayland.sh $UBUNTU_ROOTFS_PATH/usr/local/bin/
-	sudo cp -rpvf $UBUNTU_PATH/bin/fix-gdm-wayland-hotplug.sh $UBUNTU_ROOTFS_PATH/usr/local/bin/
+	sudo cp -rpvf $UBUNTU_PATH/bin/resize2fs $1/etc/init.d/
+	sudo cp -rpvf $UBUNTU_PATH/bin/bluetooth-namtso.sh $1/usr/local/bin/
+	sudo cp -rpvf $UBUNTU_PATH/bin/fan_setup.sh $1/usr/local/bin/
+	sudo cp -rpvf $UBUNTU_PATH/bin/fan.sh $1/usr/local/bin/
+	sudo cp -rpvf $UBUNTU_PATH/bin/namtso_bluetooth_suspend.sh $1/usr/local/bin/
+	sudo cp -rpvf $UBUNTU_PATH/bin/fix-dp-sound.sh $1/usr/local/bin/
+	sudo cp -rpvf $UBUNTU_PATH/bin/fix-gdm-wayland.sh $1/usr/local/bin/
+	sudo cp -rpvf $UBUNTU_PATH/bin/fix-gdm-wayland-hotplug.sh $1/usr/local/bin/
 	
 
 	#copy services
-	sudo cp -rpvf $UBUNTU_PATH/services/* $UBUNTU_ROOTFS_PATH/lib/systemd/system/
+	sudo cp -rpvf $UBUNTU_PATH/services/* $1/lib/systemd/system/
 
 	#enable services
-	sudo chroot $UBUNTU_ROOTFS_PATH /bin/bash -c "systemctl --no-reload enable resize2fs.service"
-	sudo chroot $UBUNTU_ROOTFS_PATH /bin/bash -c "systemctl --no-reload enable rockchip-isp.service"
-	sudo chroot $UBUNTU_ROOTFS_PATH /bin/bash -c "systemctl --no-reload enable bluetooth-namtso.service"
-	sudo chroot $UBUNTU_ROOTFS_PATH /bin/bash -c "systemctl --no-reload enable bluetooth-suspend.service"
-	sudo chroot $UBUNTU_ROOTFS_PATH /bin/bash -c "systemctl --no-reload enable fan.service"
-	# sudo chroot $UBUNTU_ROOTFS_PATH /bin/bash -c "systemctl --no-reload enable gdm3.service"
-	sudo chroot $UBUNTU_ROOTFS_PATH /bin/bash -c "systemctl --no-reload enable fix-gdm-wayland.service"
+	sudo chroot $1 /bin/bash -c "systemctl --no-reload enable resize2fs.service"
+	sudo chroot $1 /bin/bash -c "systemctl --no-reload enable rockchip-isp.service"
+	sudo chroot $1 /bin/bash -c "systemctl --no-reload enable bluetooth-namtso.service"
+	sudo chroot $1 /bin/bash -c "systemctl --no-reload enable bluetooth-suspend.service"
+	sudo chroot $1 /bin/bash -c "systemctl --no-reload enable fan.service"
+	# sudo chroot $1 /bin/bash -c "systemctl --no-reload enable gdm3.service"
+	sudo chroot $1 /bin/bash -c "systemctl --no-reload enable fix-gdm-wayland.service"
 	
 	#disable services
-	sudo chroot $UBUNTU_ROOTFS_PATH /bin/bash -c "systemctl --no-reload mask ondemand.service"
+	sudo chroot $1 /bin/bash -c "systemctl --no-reload mask ondemand.service"
 }
 
 ubuntu_config_network()
 {
-
 	local NAMESERVER="1.0.0.1"
 	local TZDATA=
 
@@ -215,85 +221,82 @@ ubuntu_config_network()
 		TZDATA=Etc/UTC
 	fi
 
-	sudo rm -f ubuntu/base/temp/etc/network/interfaces
+	sudo rm -f $1/etc/network/interfaces
 	message "Setup timezone to '$TZDATA'"
-	echo $TZDATA | sudo tee ubuntu/base/temp/etc/timezone
-	sudo ln -sf ../usr/share/zoneinfo/$TZDATA  ubuntu/base/temp/etc/localtime
-	sudo chroot ubuntu/base/temp /bin/bash -c "dpkg-reconfigure -f noninteractive tzdata"
+	echo $TZDATA | sudo tee $1/etc/timezone
+	sudo ln -sf ../usr/share/zoneinfo/$TZDATA  $1/etc/localtime
+	sudo chroot $1 /bin/bash -c "dpkg-reconfigure -f noninteractive tzdata"
 
-	date -u '+%Y-%m-%d %H:%M:%S' | sudo tee ubuntu/base/temp/etc/fake-hwclock.data
+	date -u '+%Y-%m-%d %H:%M:%S' | sudo tee $1/etc/fake-hwclock.data
 
 	# configure network manager
-	sudo sed "s/managed=\(.*\)/managed=true/g" -i ubuntu/base/temp/etc/NetworkManager/NetworkManager.conf
-	sudo sed "/dns/d" -i ubuntu/base/temp/etc/NetworkManager/NetworkManager.conf
-	sudo sed "/rc-manager/d" -i ubuntu/base/temp/etc/NetworkManager/NetworkManager.conf
-	sudo sed "s/\[main\]/\[main\]\ndns=default\nrc-manager=file/g" -i ubuntu/base/temp/etc/NetworkManager/NetworkManager.conf
+	sudo sed "s/managed=\(.*\)/managed=true/g" -i $1/etc/NetworkManager/NetworkManager.conf
+	sudo sed "/dns/d" -i $1/etc/NetworkManager/NetworkManager.conf
+	sudo sed "/rc-manager/d" -i $1/etc/NetworkManager/NetworkManager.conf
+	sudo sed "s/\[main\]/\[main\]\ndns=default\nrc-manager=file/g" -i $1/etc/NetworkManager/NetworkManager.conf
 	if [[ -n $NM_IGNORE_DEVICES ]]; then
-		sudo mkdir -p ubuntu/base/temp/etc/NetworkManager/conf.d/
-		cat <<-EOF > ubuntu/base/temp/etc/NetworkManager/conf.d/10-ignore-interfaces.conf
+		sudo mkdir -p $1/etc/NetworkManager/conf.d/
+		cat <<-EOF > $1/etc/NetworkManager/conf.d/10-ignore-interfaces.conf
 		[keyfile]
 		unmanaged-devices=$NM_IGNORE_DEVICES
 		EOF
 	fi
 
 	# nsswitch settings for sane DNS behavior: remove resolve, assure libnss-myhostname support
-	sudo sed "s/hosts\:.*/hosts:          files mymachines dns myhostname/g" -i ubuntu/base/temp/etc/nsswitch.conf
+	sudo sed "s/hosts\:.*/hosts:          files mymachines dns myhostname/g" -i $1/etc/nsswitch.conf
 
-	if [ -d ubuntu/base/temp/etc/resolvconf/resolv.conf.d ]; then
-		echo "nameserver $NAMESERVER" | sudo tee ubuntu/base/temp/etc/resolvconf/resolv.conf.d/head
+	if [ -d $1/etc/resolvconf/resolv.conf.d ]; then
+		echo "nameserver $NAMESERVER" | sudo tee $1/etc/resolvconf/resolv.conf.d/head
 	fi
 
-	sudo sed -i "s/#DNS=.*/DNS=$NAMESERVER/g" ubuntu/base/temp/etc/systemd/resolved.conf
+	sudo sed -i "s/#DNS=.*/DNS=$NAMESERVER/g" $1/etc/systemd/resolved.conf
 
-	sudo cp -rpvf ubuntu/base/config/10-globally-managed-devices.conf ubuntu/base/temp/etc/NetworkManager/conf.d
+	sudo cp -rpvf $UBUNTU_PATH/config/10-globally-managed-devices.conf $1/etc/NetworkManager/conf.d
 
 	# ssh
-	sudo chroot ubuntu/base/temp /bin/bash -c "dpkg-reconfigure openssh-server"
+	sudo chroot $1 /bin/bash -c "dpkg-reconfigure openssh-server"
 }
 
 ubuntu_config_misc()
 {
-	local UBUNTU_PATH="ubuntu/base"
-	local UBUNTU_ROOTFS_PATH="ubuntu/base/temp"
-
 	# mount
-	sudo chroot $UBUNTU_ROOTFS_PATH /bin/bash -c "mkdir -p /userdata"
-	sudo chroot $UBUNTU_ROOTFS_PATH /bin/bash -c "mkdir -p /oem"
-	sudo cp -rpvf $UBUNTU_PATH/config/fstab $UBUNTU_ROOTFS_PATH/etc/
+	sudo chroot $1 /bin/bash -c "mkdir -p /userdata"
+	sudo chroot $1 /bin/bash -c "mkdir -p /oem"
+	sudo cp -rpvf $UBUNTU_PATH/config/fstab $1/etc/
 
 	# dtbo
-	sudo mkdir -p $UBUNTU_ROOTFS_PATH/boot/overlays/rk3588-namtso-a10-3588.dtb.overlays
-	sudo touch $UBUNTU_ROOTFS_PATH/boot/overlays/rk3588-namtso-a10-3588.dtb.overlay.env
-	echo "fdt_overlays=" | sudo tee $UBUNTU_ROOTFS_PATH/boot/overlays/rk3588-namtso-a10-3588.dtb.overlay.env
-	sudo cp -rf kernel/arch/arm64/boot/dts/rockchip/overlays/*.dtbo  $UBUNTU_ROOTFS_PATH/boot/overlays/rk3588-namtso-a10-3588.dtb.overlays
+	sudo mkdir -p $1/boot/overlays/rk3588-namtso-a10-3588.dtb.overlays
+	sudo touch $1/boot/overlays/rk3588-namtso-a10-3588.dtb.overlay.env
+	echo "fdt_overlays=" | sudo tee $1/boot/overlays/rk3588-namtso-a10-3588.dtb.overlay.env
+	sudo cp -rf kernel/arch/arm64/boot/dts/rockchip/overlays/*.dtbo  $1/boot/overlays/rk3588-namtso-a10-3588.dtb.overlays
 
 	#uEnv
-	sudo cp -rpvf $UBUNTU_PATH/config/uEnv.txt $UBUNTU_ROOTFS_PATH/boot/
+	sudo cp -rpvf $UBUNTU_PATH/config/uEnv.txt $1/boot/
 
 	# wifi & bt
-	sudo cp -rpvf $UBUNTU_PATH/firmware/wlan/* $UBUNTU_ROOTFS_PATH/lib/firmware/
-	sudo cp -rpvf $UBUNTU_PATH/bin/brcm_patchram_plus-arm64 $UBUNTU_ROOTFS_PATH/usr/local/bin/
-	sudo cp -rpvf $UBUNTU_PATH/bin/brcm_patchram_plus-armhf $UBUNTU_ROOTFS_PATH/usr/local/bin/
-	sudo cp -rpvf $UBUNTU_PATH/bin/hciattach-arm64 $UBUNTU_ROOTFS_PATH/usr/local/bin/hciattach
-	sudo cp -rpvf $UBUNTU_PATH/bin/hciattach-armhf $UBUNTU_ROOTFS_PATH/usr/local/bin/
+	sudo cp -rpvf $UBUNTU_PATH/firmware/wlan/* $1/lib/firmware/
+	sudo cp -rpvf $UBUNTU_PATH/bin/brcm_patchram_plus-arm64 $1/usr/local/bin/
+	sudo cp -rpvf $UBUNTU_PATH/bin/brcm_patchram_plus-armhf $1/usr/local/bin/
+	sudo cp -rpvf $UBUNTU_PATH/bin/hciattach-arm64 $1/usr/local/bin/hciattach
+	sudo cp -rpvf $UBUNTU_PATH/bin/hciattach-armhf $1/usr/local/bin/
 
 	# udev
-	sudo cp -rpvf $UBUNTU_PATH/config/udev/rules.d/* $UBUNTU_ROOTFS_PATH/etc/udev/rules.d/
+	sudo cp -rpvf $UBUNTU_PATH/config/udev/rules.d/* $1/etc/udev/rules.d/
 
 	# audio
-	sudo cp -rpvf $UBUNTU_PATH/config/audio/asound.state $UBUNTU_ROOTFS_PATH/var/lib/alsa/
-	sudo cp -rpvf $UBUNTU_PATH/config/audio/default.pa.jammy.a10-3588.5.10 $UBUNTU_ROOTFS_PATH/etc/pulse/
+	sudo cp -rpvf $UBUNTU_PATH/config/audio/asound.state $1/var/lib/alsa/
+	sudo cp -rpvf $UBUNTU_PATH/config/audio/default.pa.jammy.a10-3588.5.10 $1/etc/pulse/
 
 	#gdm
-	sudo sed -i 's/#WaylandEnable=.*/WaylandEnable=true/g' $UBUNTU_ROOTFS_PATH/etc/gdm3/custom.conf
-	echo "$UBUNTU_ROOTFS_PATH/usr/sbin/gdm3" | sudo tee $UBUNTU_ROOTFS_PATH/etc/X11/default-display-manager
-	sudo chroot $UBUNTU_ROOTFS_PATH /bin/bash -c "DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true dpkg-reconfigure gdm3"
+	sudo sed -i 's/#WaylandEnable=.*/WaylandEnable=true/g' $1/etc/gdm3/custom.conf
+	echo "$1/usr/sbin/gdm3" | sudo tee $1/etc/X11/default-display-manager
+	sudo chroot $1 /bin/bash -c "DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true dpkg-reconfigure gdm3"
 
 	#dp sound
-	sudo cp -R $UBUNTU_PATH/config/desktop/.config $UBUNTU_ROOTFS_PATH/etc/skel
+	sudo cp -R $UBUNTU_PATH/config/desktop/.config $1/etc/skel
 
 	#setting
-	sudo cp -R $UBUNTU_PATH/config/desktop/.local $UBUNTU_ROOTFS_PATH/etc/skel
+	sudo cp -R $UBUNTU_PATH/config/desktop/.local $1/etc/skel
 }
 
 build_ubuntu22_04()
@@ -301,7 +304,7 @@ build_ubuntu22_04()
     IMAGE_DIR="${1:-$RK_OUTDIR/ubuntu22.04}"
 
 	message "=========================================="
-	message "          Start building for Ubuntu"
+	message "          Start building for Ubuntu22.04"
 	message "=========================================="
 
     if [ ! -d ubuntu ]; then
@@ -309,101 +312,233 @@ build_ubuntu22_04()
         return
     fi
 
-    if [ ! -f ubuntu/base/ubuntu-base-22.04-base-arm64.tar.gz ]; then
-        message "ubuntu/base/ubuntu-base-22.04-base-arm64.tar.gz not exist"
+    if [ ! -f $UBUNTU_PATH/ubuntu-base-22.04-base-arm64.tar.gz ]; then
+        message "$UBUNTU_PATH/ubuntu-base-22.04-base-arm64.tar.gz not exist"
         return
     fi
 
-	cp ubuntu/base/config/headers-debian-byteshift.patch /tmp
+	cp $UBUNTU_PATH/config/headers-debian-byteshift.patch /tmp
 
 	source "$RK_SCRIPTS_DIR/kernel-helper"
 	$KMAKE bindeb-pkg KDEB_PKGVERSION=1.0 LOCAL_VERSION=-rockchip-5.10 KBUILD_DEBARCH=arm64 DEBFULLNAME=Namtso DEBEMAIL=hello@namtso.com CONFIG_SHELL=bash KDEB_COMPRESS=xz
 	rm -rf *.buildinfo *.changes
 
-    if [ ! -d ubuntu/base/temp ]; then
-        #sudo rm -rf ubuntu/base/temp
-		mkdir -p ubuntu/base/temp
-		sudo tar -xzf ubuntu/base/ubuntu-base-22.04-base-arm64.tar.gz -C ubuntu/base/temp
-		sudo cp -rpvf /usr/bin/qemu-aarch64-static ubuntu/base/temp/usr/bin/
-		echo "nameserver 1.0.0.1" | sudo tee ubuntu/base/temp/etc/resolv.conf
+    if [ ! -d $UBUNTU_ROOTFS_PATH_22_04 ]; then
+        #sudo rm -rf $UBUNTU_ROOTFS_PATH_22_04
+		mkdir -p $UBUNTU_ROOTFS_PATH_22_04
+		sudo tar -xzf $UBUNTU_PATH/ubuntu-base-22.04-base-arm64.tar.gz -C $UBUNTU_ROOTFS_PATH_22_04
+		sudo cp -rpvf /usr/bin/qemu-aarch64-static $UBUNTU_ROOTFS_PATH_22_04/usr/bin/
+		echo "nameserver 1.0.0.1" | sudo tee $UBUNTU_ROOTFS_PATH_22_04/etc/resolv.conf
     fi
 
-	sudo cp -rpvf ubuntu/base/config/sources.list ubuntu/base/temp/etc/apt/sources.list
-	sudo cp -rpvf ubuntu/base/script/chroot_script.sh ubuntu/base/temp/tmp/
-	sudo cp -rpvf ubuntu/base/script/RUNME.sh ubuntu/base/temp/tmp/
+	sudo cp -rpvf $UBUNTU_PATH/config/sources_22.04.list $UBUNTU_ROOTFS_PATH_22_04/etc/apt/sources.list
+	sudo cp -rpvf $UBUNTU_PATH/script/chroot_script_22_04.sh $UBUNTU_ROOTFS_PATH_22_04/tmp/chroot_script.sh
+	sudo cp -rpvf $UBUNTU_PATH/script/RUNME.sh $UBUNTU_ROOTFS_PATH_22_04/tmp/
 
-	if grep "ubuntu/base/temp/sys" /proc/mounts; then
-		sudo umount ubuntu/base/temp/sys
+	if grep "$UBUNTU_ROOTFS_PATH_22_04/sys" /proc/mounts; then
+		sudo umount $UBUNTU_ROOTFS_PATH_22_04/sys
 	fi
 
-	if grep "ubuntu/base/temp/run" /proc/mounts; then
-		sudo umount ubuntu/base/temp/run
+	if grep "$UBUNTU_ROOTFS_PATH_22_04/run" /proc/mounts; then
+		sudo umount $UBUNTU_ROOTFS_PATH_22_04/run
 	fi
 
-	if grep "ubuntu/base/temp/proc" /proc/mounts; then
-		sudo umount ubuntu/base/temp/proc
+	if grep "$UBUNTU_ROOTFS_PATH_22_04/proc" /proc/mounts; then
+		sudo umount $UBUNTU_ROOTFS_PATH_22_04/proc
 	fi
 
-	if grep "ubuntu/base/temp/dev/pts" /proc/mounts; then
-		sudo umount ubuntu/base/temp/dev/pts
+	if grep "$UBUNTU_ROOTFS_PATH_22_04/dev/pts" /proc/mounts; then
+		sudo umount $UBUNTU_ROOTFS_PATH_22_04/dev/pts
 	fi
 
-	if grep "ubuntu/base/temp/dev" /proc/mounts; then
-		sudo umount ubuntu/base/temp/dev
+	if grep "$UBUNTU_ROOTFS_PATH_22_04/dev" /proc/mounts; then
+		sudo umount $UBUNTU_ROOTFS_PATH_22_04/dev
 	fi
 
 
-	sudo mount -t devtmpfs chdev ubuntu/base/temp/dev
-	sudo mount -t proc chproc    ubuntu/base/temp/proc
-	sudo mount -t sysfs chsys    ubuntu/base/temp/sys
-	sudo mount -t devpts chpts   ubuntu/base/temp/dev/pts
-	sudo mount -t tmpfs chrun    ubuntu/base/temp/run
+	sudo mount -t devtmpfs chdev $UBUNTU_ROOTFS_PATH_22_04/dev
+	sudo mount -t proc chproc    $UBUNTU_ROOTFS_PATH_22_04/proc
+	sudo mount -t sysfs chsys    $UBUNTU_ROOTFS_PATH_22_04/sys
+	sudo mount -t devpts chpts   $UBUNTU_ROOTFS_PATH_22_04/dev/pts
+	sudo mount -t tmpfs chrun    $UBUNTU_ROOTFS_PATH_22_04/run
 
 	# local chroot_cmd="; ; apt -y upgrade; apt install -y vim; apt-get install -y gnome; \
 	# 				 apt-get install -y  gnome; exit"
-	sudo chroot ubuntu/base/temp /bin/bash -c "apt-get -y  update"
-	sudo chroot ubuntu/base/temp /bin/bash -c "DEBIAN_FRONTEND=noninteractive  apt-get -y --show-progress -o DPKG::Progress-Fancy=1 upgrade"
-	sudo chroot ubuntu/base/temp /bin/bash -c "apt-get -y  install sudo locales"
+	sudo chroot $UBUNTU_ROOTFS_PATH_22_04 /bin/bash -c "apt-get -y  update"
+	sudo chroot $UBUNTU_ROOTFS_PATH_22_04 /bin/bash -c "DEBIAN_FRONTEND=noninteractive  apt-get -y --show-progress -o DPKG::Progress-Fancy=1 upgrade"
+	sudo chroot $UBUNTU_ROOTFS_PATH_22_04 /bin/bash -c "apt-get -y  install sudo locales"
 
-	sudo chroot ubuntu/base/temp /bin/bash -c "locale-gen en_US.UTF-8"
-	sudo chroot ubuntu/base/temp /bin/bash -c "update-locale LANG=en_US.UTF-8 LANGUAGE=en_US.UTF-8 LC_MESSAGES=en_US.UTF-8"
+	sudo chroot $UBUNTU_ROOTFS_PATH_22_04 /bin/bash -c "locale-gen en_US.UTF-8"
+	sudo chroot $UBUNTU_ROOTFS_PATH_22_04 /bin/bash -c "update-locale LANG=en_US.UTF-8 LANGUAGE=en_US.UTF-8 LC_MESSAGES=en_US.UTF-8"
 
-    sudo chroot ubuntu/base/temp /bin/bash -c "/tmp/chroot_script.sh"
-	sudo chroot ubuntu/base/temp /bin/bash -c "/tmp/RUNME.sh"
+    sudo chroot $UBUNTU_ROOTFS_PATH_22_04 /bin/bash -c "/tmp/chroot_script.sh"
+	sudo chroot $UBUNTU_ROOTFS_PATH_22_04 /bin/bash -c "/tmp/RUNME.sh"
 
-	ubuntu_install_package
-	ubuntu_config_services
-	ubuntu_config_network
-	ubuntu_config_misc
+	ubuntu_install_package $UBUNTU_ROOTFS_PATH_22_04
+	ubuntu_config_services $UBUNTU_ROOTFS_PATH_22_04
+	ubuntu_config_network  $UBUNTU_ROOTFS_PATH_22_04
+	ubuntu_config_misc     $UBUNTU_ROOTFS_PATH_22_04
 
-    sudo umount ubuntu/base/temp/sys
-	sudo umount ubuntu/base/temp/run
-	sudo umount ubuntu/base/temp/proc
-	sudo umount ubuntu/base/temp/dev/pts
-    sudo umount ubuntu/base/temp/dev
+    sudo umount $UBUNTU_ROOTFS_PATH_22_04/sys
+	sudo umount $UBUNTU_ROOTFS_PATH_22_04/run
+	sudo umount $UBUNTU_ROOTFS_PATH_22_04/proc
+	sudo umount $UBUNTU_ROOTFS_PATH_22_04/dev/pts
+    sudo umount $UBUNTU_ROOTFS_PATH_22_04/dev
 	
 
-    if [ -d ubuntu/base/rootfs ]; then
-        sudo rm -rf ubuntu/base/rootfs
+    if [ -d $UBUNTU_PATH/rootfs ]; then
+        sudo rm -rf $UBUNTU_PATH/rootfs
     fi
 
-	if [ -f ubuntu/base/ubuntu_22.04.img ]; then
-		rm -rf ubuntu/base/ubuntu_22.04.img
+	if [ -f $UBUNTU_PATH/ubuntu_22.04.img ]; then
+		rm -rf $UBUNTU_PATH/ubuntu_22.04.img
 	fi
 
-    mkdir -p ubuntu/base/rootfs
-    dd if=/dev/zero of=ubuntu/base/ubuntu_22.04.img bs=1M count=6000
-    mkfs.ext4 ubuntu/base/ubuntu_22.04.img
-    sudo mount ubuntu/base/ubuntu_22.04.img ubuntu/base/rootfs/
-    sudo cp -rfp ubuntu/base/temp/*  ubuntu/base/rootfs
-    sudo umount ubuntu/base/rootfs/
-    e2fsck -p -f ubuntu/base/ubuntu_22.04.img
-    resize2fs  -M ubuntu/base/ubuntu_22.04.img
+    mkdir -p $UBUNTU_PATH/rootfs
+    dd if=/dev/zero of=$UBUNTU_PATH/ubuntu_22.04.img bs=1M count=6000
+    mkfs.ext4 $UBUNTU_PATH/ubuntu_22.04.img
+    sudo mount $UBUNTU_PATH/ubuntu_22.04.img $UBUNTU_PATH/rootfs/
+    sudo cp -rfp $UBUNTU_ROOTFS_PATH_22_04/*  $UBUNTU_PATH/rootfs
+    sudo umount $UBUNTU_PATH/rootfs/
+    e2fsck -p -f $UBUNTU_PATH/ubuntu_22.04.img
+    resize2fs  -M $UBUNTU_PATH/ubuntu_22.04.img
 
 
-    ln -rsf ubuntu/base/ubuntu_22.04.img "$IMAGE_DIR/rootfs.ext4"
+    ln -rsf $UBUNTU_PATH/ubuntu_22.04.img "$IMAGE_DIR/rootfs.ext4"
 
     finish_build build_ubuntu22_04 $@
+}
+
+build_ubuntu24_04()
+{
+	IMAGE_DIR="${1:-$RK_OUTDIR/ubuntu24.04}"
+
+	message "=========================================="
+	message "          Start building for Ubuntu24.04"
+	message "=========================================="
+
+    if [ ! -d ubuntu ]; then
+        message "ubuntu dir not exist"
+        return
+    fi
+
+    if [ ! -f $UBUNTU_PATH/ubuntu-base-24.04-base-arm64.tar.gz ]; then
+        message "$UBUNTU_PATH/ubuntu-base-24.04-base-arm64.tar.gz not exist"
+        return
+    fi
+
+	cp $UBUNTU_PATH/config/headers-debian-byteshift.patch /tmp
+
+	source "$RK_SCRIPTS_DIR/kernel-helper"
+	$KMAKE bindeb-pkg KDEB_PKGVERSION=1.0 LOCAL_VERSION=-rockchip-5.10 KBUILD_DEBARCH=arm64 DEBFULLNAME=Namtso DEBEMAIL=hello@namtso.com CONFIG_SHELL=bash KDEB_COMPRESS=xz
+	rm -rf *.buildinfo *.changes
+
+    if [ ! -d $UBUNTU_ROOTFS_PATH_24_04 ]; then
+        #sudo rm -rf $UBUNTU_ROOTFS_PATH_24_04
+		mkdir -p $UBUNTU_ROOTFS_PATH_24_04
+		sudo tar -xzf $UBUNTU_PATH/ubuntu-base-24.04-base-arm64.tar.gz -C $UBUNTU_ROOTFS_PATH_24_04
+		sudo cp -rpvf /usr/bin/qemu-aarch64-static $UBUNTU_ROOTFS_PATH_24_04/usr/bin/
+		echo "nameserver 1.0.0.1" | sudo tee $UBUNTU_ROOTFS_PATH_24_04/etc/resolv.conf
+    fi
+
+	sudo cp -rpvf $UBUNTU_PATH/config/sources_24.04.list $UBUNTU_ROOTFS_PATH_24_04/etc/apt/sources.list
+	sudo cp -rpvf $UBUNTU_PATH/script/chroot_script_24_04.sh $UBUNTU_ROOTFS_PATH_24_04/tmp/chroot_script.sh
+	sudo cp -rpvf $UBUNTU_PATH/script/RUNME.sh $UBUNTU_ROOTFS_PATH_24_04/tmp/
+
+	if grep "$UBUNTU_ROOTFS_PATH_24_04/sys" /proc/mounts; then
+		sudo umount $UBUNTU_ROOTFS_PATH_24_04/sys
+	fi
+
+	if grep "$UBUNTU_ROOTFS_PATH_24_04/run" /proc/mounts; then
+		sudo umount $UBUNTU_ROOTFS_PATH_24_04/run
+	fi
+
+	if grep "$UBUNTU_ROOTFS_PATH_24_04/proc" /proc/mounts; then
+		sudo umount $UBUNTU_ROOTFS_PATH_24_04/proc
+	fi
+
+	if grep "$UBUNTU_ROOTFS_PATH_24_04/dev/pts" /proc/mounts; then
+		sudo umount $UBUNTU_ROOTFS_PATH_24_04/dev/pts
+	fi
+
+	if grep "$UBUNTU_ROOTFS_PATH_24_04/dev" /proc/mounts; then
+		sudo umount $UBUNTU_ROOTFS_PATH_24_04/dev
+	fi
+
+
+	sudo mount -t devtmpfs chdev $UBUNTU_ROOTFS_PATH_24_04/dev
+	sudo mount -t proc chproc    $UBUNTU_ROOTFS_PATH_24_04/proc
+	sudo mount -t sysfs chsys    $UBUNTU_ROOTFS_PATH_24_04/sys
+	sudo mount -t devpts chpts   $UBUNTU_ROOTFS_PATH_24_04/dev/pts
+	sudo mount -t tmpfs chrun    $UBUNTU_ROOTFS_PATH_24_04/run
+
+	# local chroot_cmd="; ; apt -y upgrade; apt install -y vim; apt-get install -y gnome; \
+	# 				 apt-get install -y  gnome; exit"
+	sudo chroot $UBUNTU_ROOTFS_PATH_24_04 /bin/bash -c "apt-get -y  update"
+	sudo chroot $UBUNTU_ROOTFS_PATH_24_04 /bin/bash -c "DEBIAN_FRONTEND=noninteractive  apt-get -y --show-progress -o DPKG::Progress-Fancy=1 upgrade"
+	sudo chroot $UBUNTU_ROOTFS_PATH_24_04 /bin/bash -c "apt-get -y  install sudo locales"
+
+	sudo chroot $UBUNTU_ROOTFS_PATH_24_04 /bin/bash -c "locale-gen en_US.UTF-8"
+	sudo chroot $UBUNTU_ROOTFS_PATH_24_04 /bin/bash -c "update-locale LANG=en_US.UTF-8 LANGUAGE=en_US.UTF-8 LC_MESSAGES=en_US.UTF-8"
+
+    sudo chroot $UBUNTU_ROOTFS_PATH_24_04 /bin/bash -c "/tmp/chroot_script.sh"
+	sudo chroot $UBUNTU_ROOTFS_PATH_24_04 /bin/bash -c "/tmp/RUNME.sh"
+
+	# sudo cp -rpvf $UBUNTU_PATH/bin/mali_csffw_6.1.bin  $UBUNTU_ROOTFS_PATH_24_04/lib/firmware
+
+	cat <<-EOF | sudo tee $UBUNTU_ROOTFS_PATH_24_04/etc/apt/sources.list.d/liujianfeng1994-ubuntu-panfork-mesa-jammy.list
+	deb https://ppa.launchpadcontent.net/liujianfeng1994/panfork-mesa/ubuntu/ jammy main
+	# deb-src https://ppa.launchpadcontent.net/liujianfeng1994/panfork-mesa/ubuntu/ jammy main
+	EOF
+
+	sudo cp -rpvf $UBUNTU_PATH/config/panfork.key $UBUNTU_ROOTFS_PATH_24_04
+	sudo rm -rf $UBUNTU_ROOTFS_PATH_24_04/etc/apt/trusted.gpg.d/panfork.gpg
+	eval 'LC_ALL=C LANG=C sudo chroot $UBUNTU_ROOTFS_PATH_24_04 /bin/bash -c "cat panfork.key | gpg --dearmor -o /etc/apt/trusted.gpg.d/panfork.gpg"'
+	sudo rm -rf $UBUNTU_ROOTFS_PATH_24_04/panfork.key
+
+	# this should fix resolvconf installation failure in some cases
+	eval 'LC_ALL=C LANG=C sudo chroot $UBUNTU_ROOTFS_PATH_24_04 /bin/bash -c "echo "resolvconf resolvconf/linkify-resolvconf boolean false" | debconf-set-selections"'
+
+	sudo rm $UBUNTU_ROOTFS_PATH_24_04/etc/resolv.conf
+    echo "nameserver 1.0.0.1" | sudo tee $UBUNTU_ROOTFS_PATH_24_04/etc/resolv.conf
+
+	# stage: update packages list
+	message "Updating package list $UBUNTU_ROOTFS_PATH_24_04"
+	eval 'LC_ALL=C LANG=C sudo chroot $UBUNTU_ROOTFS_PATH_24_04 /bin/bash -c "DEBIAN_FRONTEND=noninteractive apt-get -y $apt_extra update"'
+	eval 'LC_ALL=C LANG=C sudo chroot $UBUNTU_ROOTFS_PATH_24_04 /bin/bash -c "DEBIAN_FRONTEND=noninteractive apt-get -y $apt_extra dist-upgrade"'
+
+	ubuntu_install_package  $UBUNTU_ROOTFS_PATH_24_04
+	ubuntu_config_services  $UBUNTU_ROOTFS_PATH_24_04
+	ubuntu_config_network   $UBUNTU_ROOTFS_PATH_24_04
+	ubuntu_config_misc      $UBUNTU_ROOTFS_PATH_24_04
+
+    sudo umount $UBUNTU_ROOTFS_PATH_24_04/sys
+	sudo umount $UBUNTU_ROOTFS_PATH_24_04/run
+	sudo umount $UBUNTU_ROOTFS_PATH_24_04/proc
+	sudo umount $UBUNTU_ROOTFS_PATH_24_04/dev/pts
+    sudo umount $UBUNTU_ROOTFS_PATH_24_04/dev
+	
+
+    if [ -d $UBUNTU_PATH/rootfs ]; then
+        sudo rm -rf $UBUNTU_PATH/rootfs
+    fi
+
+	if [ -f $UBUNTU_PATH/ubuntu_24.04.img ]; then
+		rm -rf $UBUNTU_PATH/ubuntu_24.04.img
+	fi
+
+    mkdir -p $UBUNTU_PATH/rootfs
+    dd if=/dev/zero of=$UBUNTU_PATH/ubuntu_24.04.img bs=1M count=6000
+    mkfs.ext4 $UBUNTU_PATH/ubuntu_24.04.img
+    sudo mount $UBUNTU_PATH/ubuntu_24.04.img $UBUNTU_PATH/rootfs/
+    sudo cp -rfp $UBUNTU_ROOTFS_PATH_24_04/*  $UBUNTU_PATH/rootfs
+    sudo umount $UBUNTU_PATH/rootfs/
+    e2fsck -p -f $UBUNTU_PATH/ubuntu_24.04.img
+    resize2fs  -M $UBUNTU_PATH/ubuntu_24.04.img
+
+
+    ln -rsf $UBUNTU_PATH/ubuntu_24.04.img "$IMAGE_DIR/rootfs.ext4"
+	finish_build build_ubuntu24_04 $@
 }
 
 # Hooks
@@ -418,7 +553,8 @@ usage_hook()
 	echo -e "buildroot                         \tbuild buildroot rootfs"
 	echo -e "yocto                             \tbuild yocto rootfs"
 	echo -e "debian                            \tbuild debian rootfs"
-	echo -e "ubuntu                            \tbuild ubuntu rootfs"
+	echo -e "ubuntu22.04                       \tbuild ubuntu22.04 rootfs"
+	echo -e "ubuntu24.04                       \tbuild ubuntu24.04 rootfs"
 }
 
 clean_hook()
@@ -432,15 +568,18 @@ clean_hook()
 
 	rm -rf "$RK_OUTDIR/buildroot"
 	rm -rf "$RK_OUTDIR/yocto"
-	rm -rf "$RK_OUTDIR/ubuntu"
-	rm -rf  ubuntu/base/temp
-	rm -rf  ubuntu/base/ubuntu_22.04.img
+	rm -rf "$RK_OUTDIR/ubuntu22.04"
+	rm -rf "$RK_OUTDIR/ubuntu24.04"
+	rm -rf "$UBUNTU_ROOTFS_PATH_22_04"
+	rm -rf "$UBUNTU_ROOTFS_PATH_24_04"
+	rm -rf "$UBUNTU_PATH/ubuntu_22.04.img"
+	rm -rf "$UBUNTU_PATH/ubuntu_24.04.img"
 	rm -rf "$RK_OUTDIR/debian"
 	rm -rf "$RK_OUTDIR/rootfs"
 	rm -rf "$RK_FIRMWARE_DIR/rootfs.img"
 }
 
-INIT_CMDS="default buildroot debian yocto ubuntu"
+INIT_CMDS="default buildroot debian yocto ubuntu22.04 ubuntu24.04"
 init_hook()
 {
 	load_config RK_ROOTFS
@@ -455,6 +594,14 @@ init_hook()
 		notice "Using rootfs system($RK_ROOTFS_SYSTEM) from environment"
 	else
 		return 0
+	fi
+
+	if [ $RK_ROOTFS_SYSTEM = "ubuntu22.04" ]; then
+		RK_ROOTFS_SYSTEM=ubuntu_22_04
+	fi
+
+	if [ $RK_ROOTFS_SYSTEM = "ubuntu24.04" ]; then
+		RK_ROOTFS_SYSTEM=ubuntu_24_04
 	fi
 
 	ROOTFS_CONFIG="RK_ROOTFS_SYSTEM=\"$RK_ROOTFS_SYSTEM\""
@@ -505,7 +652,7 @@ pre_build_hook()
 	esac
 }
 
-BUILD_CMDS="rootfs buildroot debian yocto ubuntu"
+BUILD_CMDS="rootfs buildroot debian yocto ubuntu22.04 ubuntu24.04"
 build_hook()
 {
 	check_config RK_ROOTFS || false
@@ -525,7 +672,7 @@ build_hook()
 	message "=========================================="
 
 	case "$ROOTFS" in
-		yocto | debian | buildroot | ubuntu) ;;
+		yocto | debian | buildroot | ubuntu22.04 | ubuntu24.04) ;;
 		*) usage ;;
 	esac
 
@@ -538,7 +685,8 @@ build_hook()
 		yocto) build_yocto "$IMAGE_DIR" ;;
 		debian) build_debian "$IMAGE_DIR" ;;
 		buildroot) build_buildroot "$IMAGE_DIR" ;;
-		ubuntu) build_ubuntu22_04 "$IMAGE_DIR" ;;
+		ubuntu22.04) build_ubuntu22_04 "$IMAGE_DIR" ;;
+		ubuntu24.04) build_ubuntu24_04 "$IMAGE_DIR" ;;
 	esac
 	touch "$ROOTFS_DIR/.stamp_build_finish"
 
@@ -566,6 +714,6 @@ source "${RK_BUILD_HELPER:-$(dirname "$(realpath "$0")")/../build-hooks/build-he
 
 case "${1:-rootfs}" in
 	buildroot-config | bconfig | buildroot-make | bmake) pre_build_hook $@ ;;
-	buildroot | debian | yocto | ubuntu) init_hook $@ ;&
+	buildroot | debian | yocto | ubuntu22.04 | ubuntu24.04) init_hook $@ ;&
 	*) build_hook $@ ;;
 esac

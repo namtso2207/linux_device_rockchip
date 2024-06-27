@@ -23,7 +23,8 @@ config RK_ROOTFS_SYSTEM
 	default "buildroot" if RK_ROOTFS_SYSTEM_BUILDROOT
 	default "debian" if RK_ROOTFS_SYSTEM_DEBIAN
 	default "yocto" if RK_ROOTFS_SYSTEM_YOCTO
-	default "ubuntu" if RK_ROOTFS_SYSTEM_UBUNTU
+	default "ubuntu22.04" if RK_ROOTFS_SYSTEM_UBUNTU_22_04
+	default "ubuntu24.04" if RK_ROOTFS_SYSTEM_UBUNTU_24_04
 
 choice
 	prompt "default rootfs system"
@@ -42,9 +43,13 @@ config RK_ROOTFS_SYSTEM_YOCTO
 	bool "yocto"
 	depends on RK_YOCTO
 
-config RK_ROOTFS_SYSTEM_UBUNTU
-	bool "ubuntu"
-	depends on NAMTSO_UBUNTU
+config RK_ROOTFS_SYSTEM_UBUNTU_22_04
+	bool "ubuntu22.04"
+	depends on NAMTSO_UBUNTU_22_04
+
+config RK_ROOTFS_SYSTEM_UBUNTU_24_04
+	bool "ubuntu24.04"
+	depends on NAMTSO_UBUNTU_24_04
 
 endchoice
 
