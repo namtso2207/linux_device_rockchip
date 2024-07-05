@@ -1,7 +1,5 @@
 #!/bin/bash -e
 
-set -x
-
 build_buildroot()
 {
 	check_config RK_BUILDROOT || false
@@ -297,6 +295,18 @@ ubuntu_config_misc()
 
 	#setting
 	sudo cp -R $UBUNTU_PATH/config/desktop/.local $1/etc/skel
+
+	sudo cp -arf $UBUNTU_PATH/config/desktop/.config $1/home/namtso
+	sudo cp -arf $UBUNTU_PATH/config/desktop/.local $1/home/namtso
+
+	eval 'LC_ALL=C LANG=C sudo chroot $1 /bin/bash -c "chown namtso:namtso /home/namtso/.config -R"'
+	eval 'LC_ALL=C LANG=C sudo chroot $1 /bin/bash -c "chown namtso:namtso /home/namtso/.local  -R"'
+	eval 'LC_ALL=C LANG=C sudo chroot $1 /bin/bash -c "chown root:root /home/"'
+
+	sudo mkdir -p $1/usr/local/icons
+	sudo cp -rpvf $UBUNTU_PATH/config/desktop/icons/* $1/usr/local/icons
+
+	sudo cp -rpvf $UBUNTU_PATH/bin/rc.local $1/etc/
 }
 
 build_ubuntu22_04()
@@ -570,8 +580,8 @@ clean_hook()
 	rm -rf "$RK_OUTDIR/yocto"
 	rm -rf "$RK_OUTDIR/ubuntu22.04"
 	rm -rf "$RK_OUTDIR/ubuntu24.04"
-	rm -rf "$UBUNTU_ROOTFS_PATH_22_04"
-	rm -rf "$UBUNTU_ROOTFS_PATH_24_04"
+	sudo rm -rf "$UBUNTU_ROOTFS_PATH_22_04"
+	sudo rm -rf "$UBUNTU_ROOTFS_PATH_24_04"
 	rm -rf "$UBUNTU_PATH/ubuntu_22.04.img"
 	rm -rf "$UBUNTU_PATH/ubuntu_24.04.img"
 	rm -rf "$RK_OUTDIR/debian"
