@@ -185,7 +185,6 @@ ubuntu_config_services()
 	sudo cp -rpvf $UBUNTU_PATH/bin/fix-dp-sound.sh $1/usr/local/bin/
 	sudo cp -rpvf $UBUNTU_PATH/bin/fix-gdm-wayland.sh $1/usr/local/bin/
 	sudo cp -rpvf $UBUNTU_PATH/bin/fix-gdm-wayland-hotplug.sh $1/usr/local/bin/
-	
 
 	#copy services
 	sudo cp -rpvf $UBUNTU_PATH/services/* $1/lib/systemd/system/
@@ -201,6 +200,11 @@ ubuntu_config_services()
 	
 	#disable services
 	sudo chroot $1 /bin/bash -c "systemctl --no-reload mask ondemand.service"
+
+	if [ "$1" = "$UBUNTU_ROOTFS_PATH_24_04" ]; then
+		sudo cp -rpvf $UBUNTU_PATH/bin/fix-gdm-multi-screen-display.sh $1/usr/local/bin/
+		sudo chroot $1 /bin/bash -c "systemctl --no-reload enable gdm_multi_screen_display.service"
+	fi
 }
 
 ubuntu_config_network()
@@ -277,6 +281,9 @@ ubuntu_config_misc()
 	sudo cp -rpvf $UBUNTU_PATH/bin/brcm_patchram_plus-armhf $1/usr/local/bin/
 	sudo cp -rpvf $UBUNTU_PATH/bin/hciattach-arm64 $1/usr/local/bin/hciattach
 	sudo cp -rpvf $UBUNTU_PATH/bin/hciattach-armhf $1/usr/local/bin/
+	if [ ! -d $1/etc/firmware ]; then
+		sudo chroot $1 /bin/bash -c "ln -s /lib/firmware /etc/firmware"
+	fi
 
 	# udev
 	sudo cp -rpvf $UBUNTU_PATH/config/udev/rules.d/* $1/etc/udev/rules.d/
