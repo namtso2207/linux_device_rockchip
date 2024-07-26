@@ -314,6 +314,16 @@ ubuntu_config_misc()
 	sudo cp -rpvf $UBUNTU_PATH/config/desktop/icons/* $1/usr/local/icons
 
 	sudo cp -rpvf $UBUNTU_PATH/bin/rc.local $1/etc/
+
+	# OTA
+	if [ -f device/rockchip/common/tools/aarch64/update ]; then
+		sudo cp -rpvf device/rockchip/common/tools/aarch64/update  $1/usr/local/bin/
+	fi
+
+	if [ -f device/rockchip/common/tools/aarch64/updateEngine ]; then
+		sudo cp -rpvf device/rockchip/common/tools/aarch64/updateEngine  $1/usr/local/bin/
+	fi
+
 }
 
 build_ubuntu22_04()
