@@ -167,6 +167,20 @@ ubuntu_install_package()
 	sudo chroot $1 /bin/bash -c "dpkg -i /root/linux-image-rockchip-5.10_1.0_arm64.deb"
 	sudo chroot $1 /bin/bash -c "dpkg -i /root/linux-dtb-rockchip-5.10_1.0_arm64.deb"
 	sudo chroot $1 /bin/bash -c "dpkg -i /root/linux-headers-rockchip-5.10_1.0_arm64.deb"
+
+	if [ "$1" = "$UBUNTU_ROOTFS_PATH_24_04" ]; then
+		sudo cp -rpvf $UBUNTU_PATH/config/chromium.conf $1/etc/
+
+		if [ ! -d $1/etc/chromium.d ]; then
+			sudo mkdir $1/etc/chromium.d
+		fi
+
+		sudo chroot $1 /bin/bash -c "ln -sf /etc/chromium.conf /etc/chromium.d/khadas-default-flags"
+
+		sudo chroot $1 /bin/bash -c "dpkg -i /root/chromium-common_126.0.6478.126-1_arm64.deb"
+		sudo chroot $1 /bin/bash -c "dpkg -i /root/chromium_126.0.6478.126-1_arm64.deb"
+	fi
+
 	sudo chroot $1 /bin/bash -c "rm -rf /root/*.deb"
 }
 
